@@ -1,13 +1,13 @@
 {
   "private": true,
-  "name": "babel-starter-kit",
-  "version": "0.0.0",
+  "name": "konstraint",
+  "version": "0.0.1",
   "description": "A project template for authoring and publishing JavaScript libraries",
-  "homepage": "https://www.kriasoft.com/babel-starter-kit/",
-  "repository": "kriasoft/babel-starter-kit",
-  "author": "Kriasoft <hello@kriasoft.com> (https://www.kriasoft.com)",
+  "homepage": "https://github.com/chetanism/konstraint/",
+  "repository": "chetanism/konstraint",
+  "author": "Chetan Verma <verma.chetan@gmail.com>",
   "contributors": [
-    "Konstantin Tarkus <hello@tarkus.me>"
+    "Chetan Verma <verma.chetan@gmail.com>"
   ],
   "license": "MIT",
   "keywords": [],
@@ -15,7 +15,7 @@
   "jsnext:main": "index.es6.js",
   "babel": {
     "presets": [
-      "es2015",
+      ["es2015", { "modules": false }],
       "stage-0"
     ],
     "plugins": [
@@ -63,7 +63,6 @@
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "build": "node tools/build",
     "prepublish": "npm run build",
-    "publish:docs": "easystatic deploy docs --repo kriasoft/babel-starter-kit",
     "start": "easystatic start docs"
   }
 }
