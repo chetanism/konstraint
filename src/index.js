@@ -3,3 +3,4 @@ const konstraint = new Konstraint;
 
 export { Konstraint };
 export default konstraint;
+

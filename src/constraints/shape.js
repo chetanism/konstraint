@@ -1,19 +1,15 @@
-import object from '../types/object';
-
 export default {
-  propType: null,
+  build: (shape) => (shape),
 
-  build: (shape) => ({shape}),
-
-  validate(value, options) {
+  validate(value, shape, konstraint) {
     if (value == null) return null;
 
-    const objectError = object.validate(value);
+    const objectError = konstraint.getValidator('object').validate(value);
     if (objectError) return objectError;
 
-    const errors = Object.keys(options.shape).map(k => {
+    const errors = Object.keys(shape).map(k => {
       const v = value[k] === undefined ? null : value[k];
-      const keyErrors = this.propType.validate(v, options.shape[k]);
+      const keyErrors = konstraint.validate(v, shape[k]);
       return { key: k, errors: keyErrors };
     }).filter(e => !!e.err);
 

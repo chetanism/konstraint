@@ -1,16 +1,9 @@
-import array from './types/array';
-import bool from './types/boolean';
-import date from './types/date';
-import func from './types/function';
-import number from './types/number';
 import type from './types/type';
-import object from './types/object';
-import string from './types/string';
-import symbol from './types/symbol';
+import typeFactory from './types/typeFactory';
 
 import arrayOf from './constraints/arrayOf';
 import objectOf from './constraints/objectOf';
-import oneOfType from './constraints/oneOfType';
+import anyOne from './constraints/anyOne';
 import shape from './constraints/shape';
 
 import req from './constraints/required';
@@ -20,52 +13,50 @@ import oneOf from './constraints/oneOf';
 
 class Konstraint {
   validators = new Map;
-  
+
   constructor() {
     this.register('required', req);
 
     this.register('type', type);
-    this.register('number', number);
-    this.register('bool', bool);
-    this.register('func', func);
-    this.register('array', array);
-    this.register('object', object);
-    this.register('date', date);
-    this.register('string', string);
-    this.register('symbol', symbol);
+    this.register('number', typeFactory('number'));
+    this.register('bool', typeFactory('boolean'));
+    this.register('func', typeFactory('function'));
+    this.register('array', typeFactory('array'));
+    this.register('object', typeFactory('object'));
+    this.register('date', typeFactory('date'));
+    this.register('string', typeFactory('string'));
+    this.register('symbol', typeFactory('symbol'));
 
     this.register('greaterThan', greaterThan);
     this.register('lessThan', lessThan);
     this.register('oneOf', oneOf);
 
-    this.register('arrayOf', arrayOf, true);
-    this.register('objectOf', objectOf, true);
-    this.register('oneOfType', oneOfType, true);
-    this.register('shape', shape, true);
+    this.register('arrayOf', arrayOf);
+    this.register('objectOf', objectOf);
+    this.register('anyOne', anyOne);
+    this.register('shape', shape);
   }
 
-  register(name, validator, needsPropType = false) {
-    const copy = needsPropType ? Object.create(validator) : validator;
-    this.validators.set(name, copy);
-    if (needsPropType) copy.propType = this;
+  register(name, validator) {
+    this.validators.set(name, validator);
+  }
 
-    this[name] = (...args) => {
-      
-    }
+  getValidator(name) {
+    return this.validators.get(name);
   }
 
   build() {
     const getHandler = (target, name, receiver) => {
-      if (target[name]) {
+      if (target[name] !== undefined) {
         return target[name];
       }
 
-      const validator = this.validators.get(name);
+      const validator = this.getValidator(name);
 
       if (!validator) return target[name];
 
       return (...args) => {
-        target.push({ type: name, options: validator.build(...args)});
+        target[validator.parent || name] = validator.build(...args);
         return receiver;
       }
     };
@@ -74,13 +65,13 @@ class Konstraint {
       get: getHandler
     };
 
-    return new Proxy([], constraintHandler);
+    return new Proxy({}, constraintHandler);
   }
 
   validate = (value, constraints) => {
-    const errors = constraints
-      .map(c => this.validators.get(c.type).validate(value, c.options))
-      .filter(e => !!e);
+    const errors = Object.keys(constraints)
+      .map(c => ({type: c, error: this.validators.get(c).validate(value, constraints[c], this)}))
+      .filter(e => !!e.error);
 
     return errors.length === 0 ? null : errors;
   }

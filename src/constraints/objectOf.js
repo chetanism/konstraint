@@ -1,16 +1,14 @@
-import object from '../types/object';
-
 export default {
-  build: (constraints) => ({ constraints }),
+  build: (constraints) => (constraints),
   
-  validate(value, options) {
+  validate(value, constraints, konstraint) {
     if (value == null) return null;
 
-    const objectError = object.validate(value);
+    const objectError = konstraint.getValidator('object').validate(value);
     if (objectError) return objectError;
 
     const errors = Object.keys(value)
-      .map(k => ({key: k, errors: this.propType.validate(value[k], options.constraints)}))
+      .map(k => ({key: k, errors: konstraint.validate(value[k], constraints)}))
       .filter(e => !!e.errors);
 
     return errors.length === 0 ? null : {

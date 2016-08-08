@@ -1,14 +1,14 @@
 export default {
-  build: (value) => ({ value }),
+  build: (value) => value,
   
-  validate(value, options) {
+  validate(value, minValue) {
     if (value == null) return null;
 
-    if (value > options.value) return null;
+    if (value > minValue) return null;
     
     return {
       message: 'Invalid value',
-      expected: `greater than ${options.value}`,
+      expected: `greater than ${minValue}`,
     };
   }
 }

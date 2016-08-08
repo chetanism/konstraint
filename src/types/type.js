@@ -1,17 +1,16 @@
 export default {
-  build(typename) {
-    return {
-      typename: typename
-    }
-  },
+  build: (typename) => typename,
   
-  validate(value, options) {
+  validate(value, typename) {
     if (value == null) return null;
 
-    if (typeof value === options.typename) return null;
+    if (typeof value === typename) return null;
+    if (typename === 'array' && Array.isArray(value)) return null;
+    if (typename === 'date' && value instanceof Date) return null;
+
     return {
       message: 'Invalid Type',
-      expected: options.typename,
+      expected: typename,
     };
   }
 }
