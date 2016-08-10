@@ -39,6 +39,9 @@ class Konstraint {
 
   register(name, validator) {
     this.validators.set(name, validator);
+    this[name] = function (...args) {
+      return this.build()[name](...args);
+    }
   }
 
   getValidator(name) {
