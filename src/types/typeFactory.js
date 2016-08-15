@@ -5,6 +5,6 @@ export default (typename) => {
   return {
     parent: 'type',
     build: () => typeOptions,
-    validate: type.validate
+    validate: (v) => type.validate(v, typeOptions)
   };
 };
